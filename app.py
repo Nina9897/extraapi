@@ -2,6 +2,7 @@
 from flask import Flask, send_from_directory
 from config import db, migrate
 from routes.usuario import user_bp
+from routes.product import product_bp
 from flask_cors import CORS
 from dotenv import load_dotenv
 from flask_jwt_extended import JWTManager
@@ -25,6 +26,7 @@ db.init_app(app)
 migrate.init_app(app, db)
 
 app.register_blueprint(user_bp, url_prefix='/users')
+app.register_blueprint(product_bp, url_prefix='/products')
 
 @app.route("/swagger.yaml")
 def get_swagger_yaml():

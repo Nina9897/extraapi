@@ -8,7 +8,7 @@ info:
     - [Documentación de SWAPI](https://swapi.dev/documentation)
   termsOfService: http://swagger.io/terms/
   contact:
-    email: al222310970@gmail.com
+    email: al222310595@gmail.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -19,11 +19,10 @@ externalDocs:
   url: http://swagger.io
 
 servers:
-  - url: 18.217.244.138
+  - url: https://18.116.62.128
 
 tags:
   - name: users
-    description: Operaciones relacionadas con los usuarios
 
 paths:
   /users:
@@ -44,6 +43,10 @@ paths:
                   $ref: '#/components/schemas/User'
         '500':
           description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/{id}:
     get:
@@ -58,7 +61,7 @@ paths:
           required: true
           description: ID del usuario a obtener
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Usuario obtenido exitosamente
@@ -68,8 +71,16 @@ paths:
                 $ref: '#/components/schemas/User'
         '404':
           description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/create:
     post:
@@ -84,12 +95,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserCreate'
       responses:
         '201':
           description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '400':
           description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/edit/{id}:
     post:
@@ -104,29 +123,33 @@ paths:
           required: true
           description: ID del usuario a editar
           schema:
-            type: string
+            type: integer
       requestBody:
         description: Nuevos datos del usuario
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: "Jane Doe"
-                email:
-                  type: string
-                  format: email
-                  example: "janedoe@example.com"
+              $ref: '#/components/schemas/UserUpdate'
       responses:
         '200':
           description: Usuario modificado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '404':
           description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Error al modificar el usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/delete/{id}:
     delete:
@@ -141,14 +164,30 @@ paths:
           required: true
           description: ID del usuario a eliminar
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Usuario eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Usuario eliminado exitosamente."
         '404':
           description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Error al eliminar el usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /users/login:
     post:
@@ -163,40 +202,148 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                  example: "johndoe@example.com"
-                password:
-                  type: string
-                  example: "password123"
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
           description: Inicio de sesión exitoso
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  access_token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        example: "1"
-                      name:
-                        type: string
-                        example: "John Doe"
-                      email:
-                        type: string
-                        example: "johndoe@example.com"
+                $ref: '#/components/schemas/LoginResponse'
         '401':
           description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /products:
+    get:
+      tags:
+        - products
+      summary: Obtener todos los productos
+      description: Devuelve una lista de todos los productos registrados.
+      operationId: getAllProducts
+      responses:
+        '200':
+          description: Lista de productos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          description: Error interno del servidor
+
+  /products/{id}:
+    get:
+      tags:
+        - products
+      summary: Obtener un producto por ID
+      description: Devuelve los datos de un producto específico.
+      operationId: getProductById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del producto a obtener
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Producto no encontrado
+        '500':
+          description: Error interno del servidor
+
+  /products/create:
+    post:
+      tags:
+        - products
+      summary: Crear un nuevo producto
+      description: Crea un producto con los datos proporcionados.
+      operationId: createProduct
+      requestBody:
+        description: Datos del producto a crear
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Producto creado exitosamente
+        '400':
+          description: Datos inválidos
+
+  /products/edit/{id}:
+    post:
+      tags:
+        - products
+      summary: Editar un producto
+      description: Edita los datos de un producto existente.
+      operationId: editProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del producto a editar
+          schema:
+            type: string
+      requestBody:
+        description: Nuevos datos del producto
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Croquetas para perros"
+                price:
+                  type: number
+                  format: float
+                  example: 199.99
+                stock:
+                  type: integer
+                  example: 50
+      responses:
+        '200':
+          description: Producto modificado exitosamente
+        '404':
+          description: Producto no encontrado
+        '500':
+          description: Error al modificar el producto
+
+  /products/delete/{id}:
+    delete:
+      tags:
+        - products
+      summary: Eliminar un producto
+      description: Elimina un producto basado en su ID.
+      operationId: deleteProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del producto a eliminar
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto eliminado exitosamente
+        '404':
+          description: Producto no encontrado
+        '500':
+          description: Error al eliminar el producto
+
 
 components:
   schemas:
@@ -204,8 +351,8 @@ components:
       type: object
       properties:
         id:
-          type: string
-          example: "1"
+          type: integer
+          example: 1
         name:
           type: string
           example: "John Doe"
@@ -216,3 +363,83 @@ components:
         password:
           type: string
           example: "john12"
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        name:
+          type: string
+          example: "Croquetas para perros adultos"
+        price:
+          type: number
+          format: float
+          example: 299.99
+        stock:
+          type: integer
+          example: 100
+
+
+    UserCreate:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          example: "Jane Doe"
+        email:
+          type: string
+          format: email
+          example: "janedoe@example.com"
+        password:
+          type: string
+          example: "password123"
+
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Jane Doe Updated"
+        email:
+          type: string
+          format: email
+          example: "janeupdated@example.com"
+        password:
+          type: string
+          example: "newpassword456"
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "johndoe@example.com"
+        password:
+          type: string
+          example: "password123"
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        user:
+          $ref: '#/components/schemas/User'
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Error interno del servidor"
